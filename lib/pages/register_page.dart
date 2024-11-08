@@ -1,15 +1,45 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:myfood/components/logo.dart';
 import 'package:myfood/components/my_button.dart';
 import 'package:myfood/components/my_text_field.dart';
+import 'package:myfood/helper/helper_function.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   TextEditingController emailCotroller = TextEditingController();
+
   TextEditingController passwordController = TextEditingController();
+
   TextEditingController confirmPassController = TextEditingController();
 
-  void register(){}
+  void register()async{
+    showDialog(
+      context: context, 
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+    if(passwordController.text != confirmPassController.text){
+      Navigator.pop(context);
+      displayMessageToUser("Passowrds don't match!", context);
+    }
+    else{
+      try{
+        UserCredential? userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: emailCotroller.text, password: passwordController.text,);
+        Navigator.pushNamed(context, '/home_page');
+      }on FirebaseAuthException catch(e){
+        Navigator.pop(context);
+        displayMessageToUser(e.code, context);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +98,9 @@ class RegisterPage extends StatelessWidget {
                     width: 5,
                   ),
                   GestureDetector(
-                    onTap: (){},
+                    onTap: (){
+                      Navigator.pushNamed(context, '/login_page');
+                    },
                     child: const Text('Sign in'),
                   ),
                 ],

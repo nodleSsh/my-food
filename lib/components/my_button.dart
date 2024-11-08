@@ -14,7 +14,7 @@ class MyButton extends StatelessWidget {
     return Container(
       width: double.infinity,
       child: TextButton(
-        onPressed: () {},
+        onPressed: onPressed,
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
           child: Text(

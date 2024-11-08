@@ -1,15 +1,41 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:myfood/components/logo.dart';
 import 'package:myfood/components/my_button.dart';
 import 'package:myfood/components/my_text_field.dart';
+import 'package:myfood/helper/helper_function.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailCotroller = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  void login(){
-
+  void login() async {
+    showDialog(
+      context: context,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailCotroller.text,
+        password: passwordController.text,
+      );
+      if (context.mounted) {
+        Navigator.pop(context);
+        Navigator.pushNamed(context, '/home_page');
+      }
+    } on FirebaseAuthException catch (e) {
+      Navigator.pop(context);
+      displayMessageToUser(e.code, context);
+    }
   }
 
   @override
@@ -57,12 +83,16 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   GestureDetector(
-                    onTap: (){},
+                    onTap: () {
+                      Navigator.pushNamed(context, '/register_page');
+                    },
                     child: const Text('Create account'),
                   ),
                 ],
               ),
-              const SizedBox(height: 30,),
+              const SizedBox(
+                height: 30,
+              ),
               MyButton(
                 onPressed: login,
                 text: 'Log in',
